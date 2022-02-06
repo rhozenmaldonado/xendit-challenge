@@ -1,0 +1,423 @@
+Feature: UPDATE QR CODE
+// Happy Path Scenarios
+
+Scenario: Be able to return an response code 200 when description body parameter is patched successfully
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"description": "update-description test"
+}
+"""
+Then It should return response code 200
+And the most recent patch details for user with qr_code_id "123456" should be
+| description | update-description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+
+---
+
+Scenario: Be able to return an response code 200 when callback_url body parameter is patched successfully
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"callback_url": "https://update-mock.url/"
+}
+"""
+Then It should return response code 200
+And the most recent patch details for user with qr_code_id "123456" should be
+| description | description test |
+| callback_url | https://update-mock.url/ |
+| amount | 1500 |
+
+---
+
+Scenario: Be able to return an response code 200 when amount body parameter is patched successfully
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"amount": 100000
+}
+"""
+Then It should return response code 200
+And the most recent patch details for user with qr_code_id "123456" should be
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 100000 |
+
+---
+
+Scenario: Be able to return an response code 200 when decription and callback_url body parameters are patched successfully
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"description": "new-update description test",
+"callback_url": "https://new/update-mock.url/"
+}
+"""
+Then It should return response code 200
+And the most recent patch details for user with qr_code_id "123456" should be
+| description | new-update description test |
+| callback_url | https://new/update-mock.url/ |
+| amount | 1500 |
+
+---
+
+Scenario: Be able to return an response code 200 when callback_url and amount body parameters are patched successfully
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"callback_url": "https://latest-mock.url/",
+"amount" : 123000
+}
+"""
+Then It should return response code 200
+And the most recent patch details for user with qr_code_id "123456" should be
+| description | description test |
+| callback_url | https://latest-mock.url/ |
+| amount | 123000 |
+
+---
+
+Scenario: Be able to return an response code 200 when description and amount body parameters are patched successfully
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"description": "latest-description test",
+"amount" : 5000000
+}
+"""
+Then It should return response code 200
+And the most recent patch details for user with qr_code_id "123456" should be
+| description | latest-description test |
+| callback_url | https://mock.url/ |
+| amount | 5000000 |
+
+---
+
+Scenario: Be able to return an response code 200 when all body parameters are patch successfully
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"description": "new-description test",
+"callback_url": "https//new-mock.url/",
+"amount": 56000
+}
+"""
+Then It should return response code 200
+And the most recent patch details for user with qr_code_id "123456" should be
+| description | new-description test |
+| callback_url | https://new-mock.url/ |
+| amount | 56000 |
+
+---
+
+// Negative Scenarios
+
+Scenario: Should able to validate invalid qr_code_id
+Given the user with qr_code_id "123456" is authenticated for session  
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/54321
+Then it should return response with an error code of QR_CODE_NOT_FOUND_ERROR
+And error message should display "Please try again with a valid QR code Id"
+
+---
+
+Scenario: Should able to validate when QR code id is empty
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/
+Then it should return response with an error code of QR_CODE_NOT_FOUND_ERROR
+And error message should display "Please try again with a valid QR code Id"
+
+---
+
+Scenario: Should able to validate when QR code id does not exist
+Given the qr_code_id "56789" does not exist on the database
+When a PATCH request is made to https://{{base}}/qr_codes/56789
+Then it should return response with an error code of QR_CODE_NOT_FOUND_ERROR
+And error message should display "QR code does not exist. Please try again with a valid QR code Id."
+
+---
+
+Scenario: Should able to validate when description value is invalid
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"description": "12345"
+}
+"""
+Then it should return response with an error code of API_VALIDATION_ERROR
+And error message should display "Please enter a valid description value. Description field only accepts text."
+And user with qr_code_id "123456" should not be updated
+
+---
+
+Scenario: Should able to validate when description value is empty
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"description": " "
+}
+"""
+Then it should return response with an error code of API_VALIDATION_ERROR
+And error message should display "Description value should not be empty. Please enter a valid description value."
+And user with qr_code_id "123456" should not be updated
+
+---
+
+Scenario: Should able to validate when description value is alphanumeric
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"description": "description test 123"
+}
+"""
+Then it should return response with an error code of API_VALIDATION_ERROR
+And error message should display "Please enter a valid description value. Description value only accepts text."
+And user with qr_code_id "123456" should not be updated
+
+---
+
+Scenario: Should able to validate when amount value is invalid
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"amount": "abc"
+}
+"""
+Then it should return response with an error code of API_VALIDATION_ERROR
+And error message should display "Please enter a valid amount value. Amount value only accepts number."
+And user with qr_code_id "123456" should not be updated
+
+---
+
+Scenario: Should able to validate when amount value is empty
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"amount": " "
+}
+"""
+Then it should return response with an error code of API_VALIDATION_ERROR
+And error message should display "Amount value should not be empty. Amount value only accepts number."
+And user with qr_code_id "123456" should not be updated
+
+---
+
+Scenario: Should able to validate when amount value is alphanumeric
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"amount": "1500a"
+}
+"""
+Then it should return response with an error code of API_VALIDATION_ERROR
+And error message should display "Please enter a valid amount value. Amount value only accepts number."
+And user with qr_code_id "123456" should not be updated
+
+---
+
+Scenario: Should able to validate when amount value is less than 1,500 USD
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"amount": 900
+}
+"""
+Then it should return response with an error code of API_VALIDATION_ERROR
+And error message should display "Please enter a minimum amount of 1500 USD."
+And user with qr_code_id "123456" should not be updated
+
+---
+
+Scenario: Should able to validate when amount value is more than 5,000,000 USD
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"amount": 5000100
+}
+"""
+Then it should return response with an error code of API_VALIDATION_ERROR
+And error message should display "Cannot exceed to 5,000,000 USD."
+And user with qr_code_id "123456" should not be updated
+
+---
+
+Scenario: Should able to validate when amount value has decimal
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"amount": 1540.99
+}
+"""
+Then it should return response with an error code of API_VALIDATION_ERROR
+And error message should display "Please enter a valid value. Only accept whole number."
+And user with qr_code_id "123456" should not be updated
+
+---
+
+Scenario: Should able to validate when json format has missing (,)
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"description": "new-description test",
+"callback_url": "https//new-mock.url/"
+"amount": 56000
+}
+"""
+Then it should return response with an error code of INVALID_JSON_FORMAT
+
+---
+
+Scenario: Should able to validate when json format has missing (" ") on the description value
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"description": new-description test
+}
+"""
+Then it should return response with an error code of INVALID_JSON_FORMAT
+
+---
+
+Scenario: Should able to validate when json format has an extra double qoute on the description value
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"description": "new-"description" test"
+}
+"""
+Then it should return response with an error code of INVALID_JSON_FORMAT
+
+---
+
+Scenario: Should able to validate when json format has a missing (:)
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"description" "new-description test",
+}
+"""
+Then it should return response with an error code of INVALID_JSON_FORMAT
+
+---
+
+Scenario: Should able to validate when json format has (,) on a single parameter value
+Given the user with qr_code_id "123456" is authenticated for session
+And has current saved values as
+| description | description test |
+| callback_url | https://mock.url/ |
+| amount | 1500 |
+When a PATCH request is made to https://{{base}}/qr_codes/123456 with request body
+"""
+{
+"description": "new-description test",
+}
+"""
+Then it should return response with an error code of INVALID_JSON_FORMAT
