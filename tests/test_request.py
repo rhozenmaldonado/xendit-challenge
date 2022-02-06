@@ -128,23 +128,23 @@ def test_qr_codes_patch_invalid_amount(mock_patch):
         assert error.code == "QR_CODE_NOT_FOUND_ERROR"
         assert error.reason == 'QR code does not exist. Please try again with a valid QR code Id.'
 
-@patch('services.requests.patch')
-def test_qr_codes_patch_invalid_jsonformat(mock_patch):
-    print('\n Should able to validate when json format has missing (" ") on the description value')
+# @patch('services.requests.patch')
+# def test_qr_codes_patch_invalid_jsonformat(mock_patch):
+#     print('\n Should able to validate when json format has missing (" ") on the description value')
 
-    # Configure the mock to return a response with an ERROR
-    mock_patch.side_effect = HTTPError(urljoin(BASE_URL, '/qr_codes/fake-qr-code-id'), "400", 'INVALID_JSON_FORMAT', {}, None)
+#     # Configure the mock to return a response with an ERROR
+#     mock_patch.side_effect = HTTPError(urljoin(BASE_URL, '/qr_codes/fake-qr-code-id'), "400", 'INVALID_JSON_FORMAT', {}, None)
 
-    # Call the service, which will send a request to the server.
-    qr_code_id = '123456'
-    header = { 'Authentication': 'fake-auth' }
-    payload = { "description": ""1234"" } 
+#     # Call the service, which will send a request to the server.
+#     qr_code_id = '123456'
+#     header = { 'Authentication': 'fake-auth' }
+#     payload = { "description": "1234" } 
 
-    try:
-        response = patch_qr_codes(qr_code_id, header, payload)
-        return response
-    except HTTPError as error:
-        print(error)
-        assert error.code == "400"
-        assert error.reason == 'INVALID_JSON_FORMAT'
+#     try:
+#         response = patch_qr_codes(qr_code_id, header, payload)
+#         return response
+#     except HTTPError as error:
+#         print(error)
+#         assert error.code == "400"
+#         assert error.reason == 'INVALID_JSON_FORMAT'
 
